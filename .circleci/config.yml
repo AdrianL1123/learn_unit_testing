@@ -1,0 +1,22 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@3.1.0
+
+jobs:
+  run-unit-test:
+    executor:
+      name: android/android-docker
+      tag: default
+    steps:
+      - checkout
+      - android/restore-gradle-cache
+      - android/runt-tests:
+          test-command: ./gradlew testDebugUnitTest
+      - android/save-gradlew-cache
+
+workflows:
+  build-and-test:
+    jobs:
+      - run-unit-test
+
