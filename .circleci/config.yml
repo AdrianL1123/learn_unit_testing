@@ -10,10 +10,24 @@ jobs:
       tag: default
     steps:
       - checkout
-      - android/runt-tests:
-          test-command: ./gradlew testDebugUnitTest
+      - restore_cache:
+          keys:
+            - gradle-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+            - gradle-
+      - run:
+          name: Changing permission for gradlew
+          command: chmod +x gradlew
+      - run:
+          name: Running gradlew dependencies
+          command: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+      - android/run_tests:
+          test_command: ./gradlew testDebugUnitTest
+
 workflows:
   build-and-test:
     jobs:
       - run-unit-test
-
